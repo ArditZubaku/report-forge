@@ -31,6 +31,35 @@ services:
           cpus: "2.0"
           memory: 2G
 
+  test_db:
+    image: postgres:17-alpine
+    container_name: postgres_db_async_api
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${DB_USER} 
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - ${TEST_DB_PORT}:5432
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - postgres_network
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
 volumes:
   postgres_data:
 
