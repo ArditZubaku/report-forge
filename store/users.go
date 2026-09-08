@@ -52,7 +52,7 @@ func (s *UserStore) CreateUser(ctx context.Context, email, password string) (*Us
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", &err)
+		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	hashedPasswordBase64 := base64.StdEncoding.EncodeToString(bytes)
