@@ -2,6 +2,7 @@ package fixtures
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -39,7 +40,7 @@ func (te *TestEnv) SetupDB(t *testing.T) func(t *testing.T) {
 	m, err := migrate.New("file://../migrations", te.Config.DatabaseURL())
 	require.NoError(t, err)
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		require.NoError(t, err)
 	}
 
