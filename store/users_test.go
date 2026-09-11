@@ -44,10 +44,3 @@ func TestUserStore(t *testing.T) {
 	require.Equal(t, user.HashedPasswordBase64, user3.HashedPasswordBase64)
 	require.Equal(t, user.CreatedAt.UnixNano(), user3.CreatedAt.UnixNano())
 }
-
-func handleErr(t *testing.T, f func() error) {
-	t.Helper()
-	if err := f(); err != nil {
-		t.Fail()
-	}
-}
