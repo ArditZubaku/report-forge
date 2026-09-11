@@ -14,16 +14,20 @@ const (
 )
 
 type Config struct {
-	APIServerHost    string `env:"API_SERVER_HOST"`
-	APIServerPort    string `env:"API_SERVER_PORT"`
-	DatabaseName     string `env:"DB_NAME"`
-	DatabaseHost     string `env:"DB_HOST"`
-	DatabasePort     string `env:"DB_PORT"`
-	DatabaseTestPort string `env:"TEST_DB_PORT"`
-	DatabaseUser     string `env:"DB_USER"`
-	DatabasePassword string `env:"DB_PASSWORD"`
-	JWTSecret        string `env:"JWT_SECRET"`
-	Env              Env    `env:"ENV" envDefault:"dev"`
+	APIServerHost         string `env:"API_SERVER_HOST"`
+	APIServerPort         string `env:"API_SERVER_PORT"`
+	DatabaseName          string `env:"DB_NAME"`
+	DatabaseHost          string `env:"DB_HOST"`
+	DatabasePort          string `env:"DB_PORT"`
+	DatabaseTestPort      string `env:"TEST_DB_PORT"`
+	DatabaseUser          string `env:"DB_USER"`
+	DatabasePassword      string `env:"DB_PASSWORD"`
+	JWTSecret             string `env:"JWT_SECRET"`
+	S3LocalStackEndpoint  string `env:"S3_LOCALSTACK_ENDPOINT"`
+	SQSLocalStackEndpoint string `env:"SQS_LOCALSTACK_ENDPOINT"`
+	S3Bucket              string `env:"S3_BUCKET"`
+	SQSQueue              string `env:"SQS_QUEUE"`
+	Env                   Env    `env:"ENV" envDefault:"dev"`
 }
 
 func New() (*Config, error) {
