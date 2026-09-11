@@ -40,12 +40,12 @@ func (s *ApiServer) Start(ctx context.Context) error {
 	middleware := newLoggingMiddleware(s.logger)
 
 	server := &http.Server{
-		Addr:    net.JoinHostPort(s.config.ApiServerHost, s.config.ApiServerPort),
+		Addr:    net.JoinHostPort(s.config.APIServerHost, s.config.APIServerPort),
 		Handler: middleware(mux),
 	}
 
 	go func() {
-		s.logger.Info("Listening on ", "port", s.config.ApiServerPort)
+		s.logger.Info("Listening on ", "port", s.config.APIServerPort)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.logger.Error("apiserver failed to listen and serve", "error", err)
 		}
