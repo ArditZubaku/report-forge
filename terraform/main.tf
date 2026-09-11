@@ -1,4 +1,3 @@
-
 variable "aws_secret_access_key" {
   type = string
 }
@@ -16,6 +15,14 @@ variable "sqs_queue" {
 }
 
 variable "s3_bucket" {
+  type = string
+}
+
+variable "s3_localstack_endpoint" {
+  type = string
+}
+
+variable "sqs_localstack_endpoint" {
   type = string
 }
 
@@ -40,8 +47,8 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    s3  = "http://s3.localhost.localstack.cloud:4566"
-    sqs = "http://localhost:4566"
+    s3  = var.s3_localstack_endpoint
+    sqs = var.sqs_localstack_endpoint
   }
 }
 
