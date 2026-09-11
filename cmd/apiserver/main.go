@@ -28,16 +28,22 @@ func run() error {
 		return err
 	}
 
+	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
+	logger := slog.New(jsonHandler)
+
 	db, err := store.NewPG(conf.DatabaseURL())
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.Error("failed to close database", "error", err)
+		}
+	}()
 
 	dataStore := store.New(db)
+	jwtManager := apiserver.NewJwtManager(conf)
 
-	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
-	logger := slog.New(jsonHandler)
-
-	server := apiserver.New(conf, logger, dataStore)
+	server := apiserver.New(conf, logger, dataStore, jwtManager)
 	return server.Start(ctx)
 }

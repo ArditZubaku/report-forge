@@ -15,20 +15,23 @@ import (
 )
 
 type ApiServer struct {
-	config *config.Config
-	logger *slog.Logger
-	store  *store.Store
+	config     *config.Config
+	logger     *slog.Logger
+	store      *store.Store
+	jwtManager *JwtManager
 }
 
 func New(
 	config *config.Config,
 	logger *slog.Logger,
 	store *store.Store,
+	jwtManager *JwtManager,
 ) *ApiServer {
 	return &ApiServer{
-		config: config,
-		logger: logger,
-		store:  store,
+		config:     config,
+		logger:     logger,
+		store:      store,
+		jwtManager: jwtManager,
 	}
 }
 
@@ -36,6 +39,7 @@ func (s *ApiServer) Start(ctx context.Context) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /ping", s.ping)
 	mux.HandleFunc("POST /auth/signup", s.signUpHandler())
+	mux.HandleFunc("POST /auth/signin", s.signInHandler())
 
 	middleware := newLoggingMiddleware(s.logger)
 
@@ -52,9 +56,7 @@ func (s *ApiServer) Start(ctx context.Context) error {
 	}()
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		<-ctx.Done()
 
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -62,7 +64,7 @@ func (s *ApiServer) Start(ctx context.Context) error {
 		if err := server.Shutdown(shutdownCtx); err != nil {
 			s.logger.Error("apiserver failed to shutdown", "error", err)
 		}
-	}()
+	})
 
 	wg.Wait()
 
