@@ -11,23 +11,37 @@ import (
 	"time"
 
 	"github.com/ArditZubaku/async-api/config"
+	"github.com/ArditZubaku/async-api/store"
 )
 
 type ApiServer struct {
 	config *config.Config
 	logger *slog.Logger
+	store  *store.Store
 }
 
-func New(config *config.Config, logger *slog.Logger) *ApiServer {
-	return &ApiServer{config: config, logger: logger}
+func New(
+	config *config.Config,
+	logger *slog.Logger,
+	store *store.Store,
+) *ApiServer {
+	return &ApiServer{
+		config: config,
+		logger: logger,
+		store:  store,
+	}
 }
 
 func (s *ApiServer) Start(ctx context.Context) error {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ping", s.ping)
+	mux.HandleFunc("GET /ping", s.ping)
+	mux.HandleFunc("POST /auth/signup", s.signUpHandler())
+
+	middleware := newLoggingMiddleware(s.logger)
+
 	server := &http.Server{
 		Addr:    net.JoinHostPort(s.config.ApiServerHost, s.config.ApiServerPort),
-		Handler: mux,
+		Handler: middleware(mux),
 	}
 
 	go func() {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/ArditZubaku/async-api/apiserver"
 	"github.com/ArditZubaku/async-api/config"
+	"github.com/ArditZubaku/async-api/store"
 )
 
 func main() {
@@ -27,9 +28,16 @@ func run() error {
 		return err
 	}
 
+	db, err := store.NewPG(conf.DatabaseURL())
+	if err != nil {
+		return err
+	}
+
+	dataStore := store.New(db)
+
 	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
 	logger := slog.New(jsonHandler)
 
-	server := apiserver.New(conf, logger)
+	server := apiserver.New(conf, logger, dataStore)
 	return server.Start(ctx)
 }
