@@ -65,12 +65,10 @@ func (j *JwtManager) GenerateTokenPair(userId uuid.UUID) (*TokenPair, error) {
 		signingMethod,
 		CustomClaims{
 			TokenType: "access",
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   userId.String(),
-				Issuer:    "http://" + j.config.APIServerHost + ":" + j.config.APIServerPort,
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-				IssuedAt:  jwt.NewNumericDate(time.Now()),
-			},
+			Subject:   userId.String(),
+			Issuer:    "http://" + j.config.APIServerHost + ":" + j.config.APIServerPort,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	)
 
@@ -89,12 +87,10 @@ func (j *JwtManager) GenerateTokenPair(userId uuid.UUID) (*TokenPair, error) {
 		signingMethod,
 		CustomClaims{
 			TokenType: "refresh",
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   userId.String(),
-				Issuer:    "http://" + j.config.APIServerHost + ":" + j.config.APIServerPort,
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 15)),
-				IssuedAt:  jwt.NewNumericDate(time.Now()),
-			},
+			Subject:   userId.String(),
+			Issuer:    "http://" + j.config.APIServerHost + ":" + j.config.APIServerPort,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 15)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	)
 
