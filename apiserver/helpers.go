@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -28,7 +29,7 @@ func handler(
 		status := http.StatusInternalServerError
 		msg := http.StatusText(status)
 		if err := f(w, r); err != nil {
-			if e, ok := err.(*ErrorWithStatus); ok {
+			if e, ok := errors.AsType[*ErrorWithStatus](err); ok {
 				status = e.status
 				msg = http.StatusText(e.status)
 				if status == http.StatusBadRequest || status == http.StatusConflict {
