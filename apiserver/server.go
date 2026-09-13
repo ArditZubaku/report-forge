@@ -12,13 +12,17 @@ import (
 
 	"github.com/ArditZubaku/async-api/config"
 	"github.com/ArditZubaku/async-api/store"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
 type ApiServer struct {
-	config     *config.Config
-	logger     *slog.Logger
-	store      *store.Store
-	jwtManager *JwtManager
+	config          *config.Config
+	logger          *slog.Logger
+	store           *store.Store
+	jwtManager      *JwtManager
+	sqsClient       *sqs.Client
+	s3PresignClient *s3.PresignClient
 }
 
 func New(
@@ -26,12 +30,16 @@ func New(
 	logger *slog.Logger,
 	store *store.Store,
 	jwtManager *JwtManager,
+	sqsClient *sqs.Client,
+	s3PresignClient *s3.PresignClient,
 ) *ApiServer {
 	return &ApiServer{
-		config:     config,
-		logger:     logger,
-		store:      store,
-		jwtManager: jwtManager,
+		config:          config,
+		logger:          logger,
+		store:           store,
+		jwtManager:      jwtManager,
+		sqsClient:       sqsClient,
+		s3PresignClient: s3PresignClient,
 	}
 }
 
@@ -41,6 +49,8 @@ func (s *ApiServer) Start(ctx context.Context) error {
 	mux.HandleFunc("POST /auth/signup", s.signUpHandler())
 	mux.HandleFunc("POST /auth/signin", s.signInHandler())
 	mux.HandleFunc("POST /auth/refresh", s.tokenRefreshHandler())
+	mux.HandleFunc("POST /reports", s.createReportHandler())
+	mux.HandleFunc("GET /reporst/{id}", s.getReportHandler())
 
 	logging := newLoggingMiddleware(s.logger)
 	auth := newAuthMiddleware(s.jwtManager, s.store.Users, s.logger)
