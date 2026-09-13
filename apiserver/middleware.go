@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -14,6 +15,15 @@ type userCtxKey struct{}
 
 func ContextWithUser(ctx context.Context, user *store.User) context.Context {
 	return context.WithValue(ctx, userCtxKey{}, user)
+}
+
+func UserFromContext(ctx context.Context) (*store.User, error) {
+	user, ok := ctx.Value(userCtxKey{}).(*store.User)
+	if !ok || user == nil {
+		return nil, errors.New("user not found in context")
+	}
+
+	return user, nil
 }
 
 func newLoggingMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler {
