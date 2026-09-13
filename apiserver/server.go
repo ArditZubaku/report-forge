@@ -50,7 +50,7 @@ func (s *ApiServer) Start(ctx context.Context) error {
 	mux.HandleFunc("POST /auth/signin", s.signInHandler())
 	mux.HandleFunc("POST /auth/refresh", s.tokenRefreshHandler())
 	mux.HandleFunc("POST /reports", s.createReportHandler())
-	mux.HandleFunc("GET /reporst/{id}", s.getReportHandler())
+	mux.HandleFunc("GET /reports/{id}", s.getReportHandler())
 
 	logging := newLoggingMiddleware(s.logger)
 	auth := newAuthMiddleware(s.jwtManager, s.store.Users, s.logger)
