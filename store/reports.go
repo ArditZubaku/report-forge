@@ -36,6 +36,25 @@ type Report struct {
 	FailedAt             *time.Time `db:"failed_at"`
 }
 
+func (r *Report) IsDone() bool {
+	return r.FailedAt != nil || r.CompletedAt != nil
+}
+
+func (r *Report) Status() string {
+	switch {
+	case r.StartedAt == nil:
+		return "requested"
+	case r.StartedAt != nil && !r.IsDone():
+		return "processing"
+	case r.CompletedAt != nil:
+		return "completed"
+	case r.FailedAt != nil:
+		return "failed"
+	default:
+		return "unknown"
+	}
+}
+
 func (s *ReportStore) Create(ctx context.Context, userId uuid.UUID, reportType string) (*Report, error) {
 	const insertQuery = `INSERT INTO reports(user_id, report_type) VALUES ($1, $2) RETURNING *;`
 
