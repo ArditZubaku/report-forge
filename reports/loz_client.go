@@ -16,7 +16,7 @@ type LozClient struct {
 	baseURL    string
 }
 
-func NewClient(baseURL string, httpClient HttpClient) *LozClient {
+func NewLozClient(httpClient HttpClient) *LozClient {
 	return &LozClient{
 		httpClient: httpClient,
 		baseURL:    "https://botw-compendium.herokuapp.com/api/v3/compendium",
