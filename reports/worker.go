@@ -119,8 +119,8 @@ func (w *Worker) Start(ctx context.Context) error {
 	}
 }
 
-func (w *Worker) processMessage(ctx context.Context, msg types.Message) any {
-	w.logger.Info("processing message", "queueUrl", *url, "messageId", *msg.MessageId)
+func (w *Worker) processMessage(ctx context.Context, msg types.Message) error {
+	w.logger.Info("processing message", "messageId", *msg.MessageId)
 	if msg.Body == nil || *msg.Body == "" {
 		w.logger.Warn("message body is empty", "message_id", msg.MessageId)
 		return nil
@@ -140,16 +140,8 @@ func (w *Worker) processMessage(ctx context.Context, msg types.Message) any {
 	builderCtx, builderCancel := context.WithTimeout(ctx, time.Second*10)
 	defer builderCancel()
 
-	_, err := w.builder.Build(builderCtx, sqsMessage.UserId, sqsMessage.ReportId)
-	if err != nil {
+	if _, err := w.builder.Build(builderCtx, sqsMessage.UserId, sqsMessage.ReportId); err != nil {
 		return fmt.Errorf("failed to build report: %w", err)
-	}
-
-	if _, err := w.sqsClient.DeleteMessage(ctx, &sqs.DeleteMessageInput{
-		QueueUrl:      url,
-		ReceiptHandle: msg.ReceiptHandle,
-	}); err != nil {
-		return fmt.Errorf("failed to delete message %s from the queue %s: %w", *msg.MessageId, *url, err)
 	}
 
 	return nil
